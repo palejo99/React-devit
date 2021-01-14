@@ -32,6 +32,10 @@ export default function Devit({ avatar, userName, content, createdAt, id }) {
           line-height: 1.3125;
         }
 
+        span {
+          margin: 0 5px;
+        }
+
         date {
           color: #555;
           font-size: 14px;

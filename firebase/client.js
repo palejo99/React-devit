@@ -24,8 +24,8 @@ const mapUserFromFirebaseAuthToUser = (user) => {
   return {
     //    avatar:avatar_url,
     avatar: photoURL,
-    email,
     username: displayName,
+    email,
     uid,
   }
 }
@@ -65,17 +65,19 @@ export const fetchLatestDevits = () => {
       return docs.map((doc) => {
         const data = doc.data() // Extrae todos los campos que hay en el documento
         const id = doc.id
+
         const { createdAt } = data
         console.log(createdAt)
         const date = new Date(createdAt.seconds * 1000)
         const normalizedCreatedAt = new Intl.DateTimeFormat("es-ES").format(
           date
         )
+        console.log(data)
 
         return {
-          data,
+          ...data,
           id,
-          createAt: normalizedCreatedAt,
+          createdAt: normalizedCreatedAt,
         }
       })
     })

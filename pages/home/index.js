@@ -7,7 +7,6 @@ export default function HomePage() {
   const [timeline, setTimeline] = useState([])
   const user = useUser()
 
-  useState([])
   // Si existe el usuario se realiza el fetch
   useEffect(() => {
     user && fetchLatestDevits().then(setTimeline)
