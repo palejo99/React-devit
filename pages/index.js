@@ -1,25 +1,26 @@
 import AppLayout from "components/AppLayout"
-import Avatar from "components/Avatar"
 import Button from "components/Button"
 import { colors } from "styles/theme"
-import { loginWithGitHub, onAuthStateChanged } from "firebase/client"
-import { useState, useEffect } from "react"
+import { loginWithGitHub } from "firebase/client"
+import { useEffect } from "react"
 import GitHub from "components/Icons/GitHub"
 import Head from "next/head"
+import { useRouter } from "next/router"
+import useUser, { USER_STATES } from "hooks/useUser"
 
 export default function Home() {
-  const [user, setUser] = useState(undefined)
+  const user = useUser()
+  const router = useRouter()
 
+  // Si existe usuario se redirecciona a la pag home
   useEffect(() => {
-    onAuthStateChanged(setUser)
-  }, [])
+    user && router.replace("/home")
+  }, [user])
   const handleClick = () => {
-    loginWithGitHub()
-      .then(setUser)
-      .catch((err) => {
-        console.log(err)
-        console.log(user)
-      })
+    loginWithGitHub().catch((err) => {
+      console.log(err)
+      console.log(user)
+    })
   }
 
   return (
@@ -38,22 +39,16 @@ export default function Home() {
             <br /> with developers 👩‍💻 👨‍💻{" "}
           </h2>
           <div>
-            {user === null && (
+            {user === USER_STATES.NOT_LOGGED && (
+              /* se pasa la referencia de la función, pero no se ejecuta cuando se
+            renderiza el componente, se le pasa la función mas no la ejecución, e.g handleClick() este 
+            se ejecuta inmediatamente después de renderizar el componente */
               <Button onClick={handleClick}>
                 <GitHub fill={colors.white}></GitHub>
                 Login with Github
               </Button>
             )}
-            {user && user.avatar && (
-              <div>
-                <Avatar
-                  alt={user.username}
-                  src={user.avatar}
-                  text={user.username}
-                />
-                <strong>{user.email}</strong>
-              </div>
-            )}
+            {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
           </div>
         </section>
       </AppLayout>

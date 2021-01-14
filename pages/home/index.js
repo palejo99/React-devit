@@ -1,15 +1,18 @@
 import AppLayout from "components/AppLayout"
 import { useEffect, useState } from "react"
 import Devit from "components/Devit"
+import useUser from "hooks/useUser"
+import { fetchLatestDevits } from "firebase/client"
 export default function HomePage() {
   const [timeline, setTimeline] = useState([])
-  useState([])
+  const user = useUser()
 
+  useState([])
+  // Si existe el usuario se realiza el fetch
   useEffect(() => {
-    fetch("http://localhost:3000/api/statuses/home_timeline")
-      .then((res) => res.json())
-      .then(setTimeline)
-  }, [])
+    user && fetchLatestDevits().then(setTimeline)
+  }, [user])
+
   return (
     <>
       <AppLayout>
@@ -17,17 +20,19 @@ export default function HomePage() {
           <h2>Inicio</h2>
         </header>
         <section>
-          {timeline.map(({ id, username, avatar, message }) => {
-            return (
+          {timeline.map(
+            ({ createdAt, id, userName, avatar, content, userId }) => (
               <Devit
-                key={id}
-                id={id}
-                username={username}
                 avatar={avatar}
-                message={message}
+                createdAt={createdAt}
+                id={id}
+                key={id}
+                content={content}
+                userName={userName}
+                userId={userId}
               />
             )
-          })}
+          )}
         </section>
         <nav></nav>
       </AppLayout>
@@ -35,10 +40,12 @@ export default function HomePage() {
         {`
           header {
             align-items: center;
-            border-top: 1px solid #ccc;
+            background: #ffffffaa;
+            border-botton: 1px solid #eee;
+            backdrop-filter: blur(5px);
             height: 49px;
-            position: fixed;
-            display: sticky;
+            display: flex;
+            position: sticky;
             top: 0;
             width: 100%;
           }
@@ -46,16 +53,14 @@ export default function HomePage() {
           h2 {
             font-size: 22px;
             font-weight: 800;
+            padding-left: 15px;
           }
 
-          section {
-            padding-top: 56px;
-          }
           nav {
+            background: #fff;
             bottom: 0;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid #eee;
             height: 49px;
-            display: flex;
             position: sticky;
             width: 100%;
           }

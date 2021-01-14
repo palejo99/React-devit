@@ -13,10 +13,16 @@ export const globalStyles = css.global`
     background-size: 50px 50px;
     padding: 0;
     margin: 0;
+    over-flow: hidden;
     font-family: ${fonts.base};
   }
   * {
     box-sizing: border-box;
+  }
+
+  textarea,
+  input {
+    font-family: ${fonts.base};
   }
 `
 export default css`
@@ -31,8 +37,9 @@ export default css`
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     height: 100%;
-    width: 100%;
+    overflow-y: auto; /*Cuando el scroll es vertical, si el contenido sobresale  al espacio existente*/
     position: relative;
+    width: 100%;
   }
 
   @media (min-width: ${breakpoints.mobile}) {
