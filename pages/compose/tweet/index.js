@@ -4,6 +4,7 @@ import useUser from "hooks/useUser"
 import { useState } from "react"
 import { addDevit } from "firebase/client"
 import { useRouter } from "next/router"
+import Head from "next/head"
 
 const COMPOSE_STATES = {
   USER_NOT_KNOW: 0,
@@ -11,12 +12,23 @@ const COMPOSE_STATES = {
   SUCESS: 2,
   ERROR: -1,
 }
+
+const DRAG_IMAGE_STATES = {
+  ERROR: -1,
+  NONE: 0,
+  DRAG_OVER: 1,
+  UPLOADING: 2,
+  COMPLETE: 3,
+}
 export default function ComposeTweet() {
   // Variables para guardar el mensaje y setear el usuario
   const user = useUser()
   const router = useRouter()
   const [status, setStatus] = useState(COMPOSE_STATES.USER_NOT_KNOW)
   const [message, setMessage] = useState("")
+  const [drag, setDrag] = useState(DRAG_IMAGE_STATES.NONE)
+  const [task, setTask] = useState(null)
+  const [imgURL, setImgURL] = useState(null)
   // Se recibe el evento del onChange, se extrae el valor y se guarda el mensaje
   const handleChange = (event) => {
     const { value } = event.target
@@ -41,15 +53,33 @@ export default function ComposeTweet() {
       })
   }
 
+  const handleDragEnter = (e) => {
+    setDrag(DRAG_IMAGE_STATES.DRAG_OVER)
+  }
+
+  const handleDragLeave = (e) => {
+    setDrag(DRAG_IMAGE_STATES.NONE)
+  }
+
+  const handleDragDrop = (e) => {
+    setDrag(DRAG_IMAGE_STATES.NONE)
+  }
+
   // De esta manera se previene que el usuario presione el botón de manera desesperada o múltiples veces.
   const isButtonDisabled = !message.length || status === COMPOSE_STATES.LOADING
   return (
     <>
       <AppLayout>
+        <Head>
+          <title>Crear un Devit / Devter</title>
+        </Head>
         <form onSubmit={handleSubmit}>
           <textarea
             /* Cada vez que hay un cambio en el textarea(evento) se ejecuta el sgte evento */
             onChange={handleChange}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDragDrop}
             placeholder="¿Qué está pasando?"
             value={message}
           ></textarea>
@@ -63,7 +93,9 @@ export default function ComposeTweet() {
           padding: 15px;
         }
         textarea {
-          border: 0;
+          border: ${drag === DRAG_IMAGE_STATES.DRAG_OVER
+            ? "3px dashed #09f"
+            : "0"}; /*Valor calculado para propiedad border */
           padding: 15px;
           resize: none;
           min-height: 200px;

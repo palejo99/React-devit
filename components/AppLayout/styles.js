@@ -36,8 +36,10 @@ export default css`
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    display: flex;
     height: 100%;
     overflow-y: auto; /*Cuando el scroll es vertical, si el contenido sobresale  al espacio existente*/
+    flex-direction: column;
     position: relative;
     width: 100%;
   }
