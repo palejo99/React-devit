@@ -1,10 +1,11 @@
 import AppLayout from "components/AppLayout"
 import Button from "components/Button"
 import useUser from "hooks/useUser"
-import { useState } from "react"
-import { addDevit } from "firebase/client"
+import { useState, useEffect } from "react"
+import { addDevit, uploadImage } from "firebase/client"
 import { useRouter } from "next/router"
 import Head from "next/head"
+import Avatar from "components/Avatar"
 
 const COMPOSE_STATES = {
   USER_NOT_KNOW: 0,
@@ -30,6 +31,19 @@ export default function ComposeTweet() {
   const [task, setTask] = useState(null)
   const [imgURL, setImgURL] = useState(null)
   // Se recibe el evento del onChange, se extrae el valor y se guarda el mensaje
+
+  useEffect(() => {
+    if (task) {
+      const onProgress = () => {}
+      const onError = () => {}
+      const onComplete = () => {
+        console.log("onComplete")
+        task.snapshot.ref.getDownloadURL().then(setImgURL)
+      }
+      task.on("state_changed", onProgress, onError, onComplete)
+    }
+  }, [task])
+
   const handleChange = (event) => {
     const { value } = event.target
     setMessage(value)
@@ -43,6 +57,7 @@ export default function ComposeTweet() {
       content: message,
       userId: user.uid,
       userName: user.username,
+      img: imgURL,
     })
       .then(() => {
         router.push("/home")
@@ -54,15 +69,23 @@ export default function ComposeTweet() {
   }
 
   const handleDragEnter = (e) => {
+    e.preventDefault()
     setDrag(DRAG_IMAGE_STATES.DRAG_OVER)
   }
 
   const handleDragLeave = (e) => {
+    e.preventDefault()
     setDrag(DRAG_IMAGE_STATES.NONE)
   }
 
   const handleDragDrop = (e) => {
+    e.preventDefault() // Para evitar el comportamiento normal del navegador
+    // console.log(e)
+    // console.log(e.dataTransfer.files[0])
     setDrag(DRAG_IMAGE_STATES.NONE)
+    const file = e.dataTransfer.files[0]
+    const task = uploadImage(file)
+    setTask(task)
   }
 
   // De esta manera se previene que el usuario presione el botón de manera desesperada o múltiples veces.
@@ -73,29 +96,81 @@ export default function ComposeTweet() {
         <Head>
           <title>Crear un Devit / Devter</title>
         </Head>
-        <form onSubmit={handleSubmit}>
-          <textarea
-            /* Cada vez que hay un cambio en el textarea(evento) se ejecuta el sgte evento */
-            onChange={handleChange}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDragDrop}
-            placeholder="¿Qué está pasando?"
-            value={message}
-          ></textarea>
-          <div>
-            <Button disabled={isButtonDisabled}>Devitear</Button>
-          </div>
-        </form>
+        <section className="form-container">
+          {
+            // Se espera a que llegue el usuario para poder renderizar el avatar
+            user && (
+              <section className="avatar-container">
+                <Avatar src={user.avatar} />
+              </section>
+            )
+          }
+
+          <form onSubmit={handleSubmit}>
+            <textarea
+              /* Cada vez que hay un cambio en el textarea(evento) se ejecuta el sgte evento */
+              onChange={handleChange}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDragDrop}
+              placeholder="¿Qué está pasando?"
+              value={message}
+            ></textarea>
+            {imgURL && (
+              <section className="remove-img">
+                <button onClick={() => setImgURL(null)}>x</button>
+                <img src={imgURL} />
+              </section>
+            )}
+            <div>
+              <Button disabled={isButtonDisabled}>Devitear</Button>
+            </div>
+          </form>
+        </section>
       </AppLayout>
       <style jsx>{`
         div {
           padding: 15px;
         }
+
+        .avatar-container {
+          padding-top: 20px;
+          padding-left: 10px;
+        }
+        button {
+          background: rgba(255, 255, 255, 0.3);
+          border: 0;
+          border-radius: 999px;
+          color: #fff;
+          font-size: 24px;
+          width: 32px;
+          height: 32px;
+          top: 15px;
+          position: absolute;
+          right: 15px;
+        }
+
+        .form-container {
+          align-items: flex-start;
+          display: flex;
+        }
+
+        .remove-img {
+          position: relative;
+        }
+        form {
+          padding: 10px;
+        }
+        img {
+          border-radius: 10px;
+          height: auto;
+          width: 100%;
+        }
         textarea {
           border: ${drag === DRAG_IMAGE_STATES.DRAG_OVER
             ? "3px dashed #09f"
-            : "0"}; /*Valor calculado para propiedad border */
+            : "3px solid transparent"}; /*Valor calculado para propiedad border */
+          border-radius: 10px;
           padding: 15px;
           resize: none;
           min-height: 200px;
