@@ -1,4 +1,3 @@
-import AppLayout from "components/AppLayout"
 import Button from "components/Button"
 import { colors } from "styles/theme"
 import { loginWithGitHub } from "firebase/client"
@@ -30,28 +29,26 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <AppLayout>
-        <section>
-          <img src="/vector.png" alt="logo" />
-          <h1>Devter</h1>
-          <h2>
-            Talk about development
-            <br /> with developers 👩‍💻 👨‍💻{" "}
-          </h2>
-          <div>
-            {user === USER_STATES.NOT_LOGGED && (
-              /* se pasa la referencia de la función, pero no se ejecuta cuando se
+      <section>
+        <img src="/vector.png" alt="logo" />
+        <h1>Devter</h1>
+        <h2>
+          Talk about development
+          <br /> with developers 👩‍💻 👨‍💻{" "}
+        </h2>
+        <div>
+          {user === USER_STATES.NOT_LOGGED && (
+            /* se pasa la referencia de la función, pero no se ejecuta cuando se
             renderiza el componente, se le pasa la función mas no la ejecución, e.g handleClick() este 
             se ejecuta inmediatamente después de renderizar el componente */
-              <Button onClick={handleClick}>
-                <GitHub fill={colors.white}></GitHub>
-                Login with Github
-              </Button>
-            )}
-            {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
-          </div>
-        </section>
-      </AppLayout>
+            <Button onClick={handleClick}>
+              <GitHub fill={colors.white}></GitHub>
+              Login with Github
+            </Button>
+          )}
+          {user === USER_STATES.NOT_KNOWN && <img src="/spinner.gif" />}
+        </div>
+      </section>
 
       <style jsx>{`
         img {

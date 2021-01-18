@@ -1,4 +1,3 @@
-import AppLayout from "components/AppLayout"
 import Button from "components/Button"
 import useUser from "hooks/useUser"
 import { useState, useEffect } from "react"
@@ -92,42 +91,41 @@ export default function ComposeTweet() {
   const isButtonDisabled = !message.length || status === COMPOSE_STATES.LOADING
   return (
     <>
-      <AppLayout>
-        <Head>
-          <title>Crear un Devit / Devter</title>
-        </Head>
-        <section className="form-container">
-          {
-            // Se espera a que llegue el usuario para poder renderizar el avatar
-            user && (
-              <section className="avatar-container">
-                <Avatar src={user.avatar} />
-              </section>
-            )
-          }
+      <Head>
+        <title>Crear un Devit / Devter</title>
+      </Head>
+      <section className="form-container">
+        {
+          // Se espera a que llegue el usuario para poder renderizar el avatar
+          user && (
+            <section className="avatar-container">
+              <Avatar src={user.avatar} />
+            </section>
+          )
+        }
 
-          <form onSubmit={handleSubmit}>
-            <textarea
-              /* Cada vez que hay un cambio en el textarea(evento) se ejecuta el sgte evento */
-              onChange={handleChange}
-              onDragEnter={handleDragEnter}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDragDrop}
-              placeholder="¿Qué está pasando?"
-              value={message}
-            ></textarea>
-            {imgURL && (
-              <section className="remove-img">
-                <button onClick={() => setImgURL(null)}>x</button>
-                <img src={imgURL} />
-              </section>
-            )}
-            <div>
-              <Button disabled={isButtonDisabled}>Devitear</Button>
-            </div>
-          </form>
-        </section>
-      </AppLayout>
+        <form onSubmit={handleSubmit}>
+          <textarea
+            /* Cada vez que hay un cambio en el textarea(evento) se ejecuta el sgte evento */
+            onChange={handleChange}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDragDrop}
+            placeholder="¿Qué está pasando?"
+            value={message}
+          ></textarea>
+          {imgURL && (
+            <section className="remove-img">
+              <button onClick={() => setImgURL(null)}>x</button>
+              <img src={imgURL} />
+            </section>
+          )}
+          <div>
+            <Button disabled={isButtonDisabled}>Devitear</Button>
+          </div>
+        </form>
+      </section>
+
       <style jsx>{`
         div {
           padding: 15px;
