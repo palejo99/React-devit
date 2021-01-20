@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import Devit from "components/Devit"
 import useUser from "hooks/useUser"
-import { fetchLatestDevits } from "firebase/client"
+import { listenLatestDevits } from "firebase/client"
 import Create from "components/Icons/Create"
 import Link from "next/link"
 import Home from "components/Icons/Home"
@@ -14,7 +14,18 @@ export default function HomePage() {
 
   // Si existe el usuario se realiza el fetch
   useEffect(() => {
-    user && fetchLatestDevits().then(setTimeline)
+    let unsubscribe
+    if (user) {
+      unsubscribe = listenLatestDevits(setTimeline)
+      /* listenLatestDevits((newDevits) => {
+        console.log("listened with!", newDevits)
+        setTimeline(newDevits) 
+      }) 
+      */
+    }
+
+    return () => unsubscribe && unsubscribe()
+    // user && fetchLatestDevits().then(setTimeline)
   }, [user])
 
   return (

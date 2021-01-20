@@ -58,26 +58,45 @@ export const addDevit = ({ avatar, content, img, userId, userName }) => {
   })
 }
 
+const mapDevitFromFirebaseToDevitObject = (doc) => {
+  const data = doc.data() // Extrae todos los campos que hay en el documento
+  const id = doc.id
+
+  const { createdAt } = data
+
+  return {
+    ...data,
+    id,
+    createdAt: +createdAt.toDate(),
+  }
+}
+
+// Cada vez que se realice una captura "snapshot" se  usa la función callback para que cada vez q se cree o elimine un devit se llame al método
+export const listenLatestDevits = (callback) => {
+  return db
+    .collection("devits")
+    .orderBy("createdAt", "desc")
+    .limit(20) // Establecer límite de devits en la home
+    .onSnapshot(({ docs }) => {
+      const newDevits = docs.map(mapDevitFromFirebaseToDevitObject)
+      callback(newDevits)
+    })
+}
+
+/*
 export const fetchLatestDevits = () => {
   return db
     .collection("devits")
     .orderBy("createdAt", "desc")
     .get()
     .then(({ docs }) => {
-      return docs.map((doc) => {
-        const data = doc.data() // Extrae todos los campos que hay en el documento
-        const id = doc.id
-
-        const { createdAt } = data
-
-        return {
-          ...data,
-          id,
-          createdAt: +createdAt.toDate(),
-        }
-      })
-    })
-}
+      // La siguiente línea es equivalente a las comentadas abajo ya q ambas reciben el parámetro  o firma doc
+      return docs.map(mapDevitFromFirebaseToDevitObject)
+    /*  return docs.map((doc) => {
+        return mapDevitFromFirebaseToDevitObject(doc)
+      }) */
+//  })
+// }
 
 export const uploadImage = (file) => {
   const ref = firebase.storage().ref("/images/$(file.name}")
